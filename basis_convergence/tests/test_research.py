@@ -28,7 +28,7 @@ def test_gap_censors_and_preserves_position():
  left=[quote('arcus',i*NS,'102','103') for i in (1,2,5,6)]
  right=[quote('lighter_rh',i*NS,'99','100') for i in (1,2,5,6)]
  s,r,e=replay('capture','SPY',left,right,1000,10,0)
- assert r[0]['exit_reason']=='DATA_GAP' and r[0]['net'] is None and r[0]['right_censored']
+ assert r[0]['exit_reason']=='CAPTURE_END' and r[0]['net'] is None and r[0]['right_censored']
  assert r[0]['inventory']['arcus']!='0' and any(x['event']=='POSITION_CENSORED' for x in e)
  assert [x['time_mono_ns'] for x in e]==sorted(x['time_mono_ns'] for x in e)
 
@@ -77,8 +77,10 @@ def test_stale_exit_censors_at_gap():
  left=[quote('arcus',NS,'102','103'),quote('arcus',2*NS,'100','101'),quote('arcus',3*NS,'100','101')]
  right=[quote('lighter_rh',NS,'99','100'),quote('lighter_rh',2*NS,'100','101',source=(2*NS-700000000)//1000),quote('lighter_rh',3*NS,'100','101')]
  _,rows,events=replay('capture','SPY',left,right,500,10,0)
- assert rows[0]['exit_reason']=='DATA_GAP' and rows[0]['exit_ns'] is None
- assert [x['event'] for x in events][-2:]==['DATA_GAP','POSITION_CENSORED']
+ assert rows[0]['exit_reason']=='BASIS_CONVERGED' and rows[0]['exit_ns']==3*NS
+ assert any(x['event']=='DATA_GAP_STARTED' for x in events)
+ assert any(x['event']=='DATA_GAP_RECOVERED' for x in events)
+ assert not any(x['event']=='EXIT_FILLED' and x['time_mono_ns']<=2*NS for x in events)
 def test_multilevel_vwap_matches_reference_for_both_sides():
  q=Quote('arcus','SPY',NS,NS,NS//1000,1,1,((D('99'),D('1')),(D('98'),D('2'))),((D('101'),D('1')),(D('102'),D('2'))))
  for side,expected in [('buy',D('101.5')),('sell',D('98.5'))]:
@@ -86,3 +88,57 @@ def test_multilevel_vwap_matches_reference_for_both_sides():
   assert amount==2 and price==expected
   amount,price=walk(q,side,D('4'))
   assert amount==3 and abs(price-(D('305')/3 if side=='buy' else D('295')/3))<D('1e-10')
+def test_gap_recovery_and_successful_exit_after_gap():
+ left=[quote('arcus',NS,'102','103'),quote('arcus',4*NS,'100','101'),quote('arcus',5*NS,'100','101')]
+ right=[quote('lighter_rh',NS,'99','100'),quote('lighter_rh',4*NS,'100','101'),quote('lighter_rh',5*NS,'100','101')]
+ _,rows,events=replay('g','SPY',left,right,500,10,0)
+ r=rows[0];assert r['gap_recoveries']==1 and r['exit_reason']=='BASIS_CONVERGED' and r['exit_ns']==4*NS
+ assert r['gaps'][0]['start_ns']==2*NS and r['gaps'][0]['end_ns']==4*NS
+ assert not any(x['event']=='EXIT_FILLED' and 2*NS<=x['time_mono_ns']<4*NS for x in events)
+ assert sum(x['event']=='DATA_GAP_ACTIVE' for x in events)==2
+
+def test_grace_window_stops_execution_but_keeps_observation():
+ left=[quote('arcus',NS,'102','103'),quote('arcus',4*NS,'100','101'),quote('arcus',5*NS,'100','101')]
+ right=[quote('lighter_rh',NS,'99','100'),quote('lighter_rh',4*NS,'100','101'),quote('lighter_rh',5*NS,'100','101')]
+ _,rows,events=replay('g','SPY',left,right,500,10,0,gap_grace_s=1)
+ assert rows[0]['right_censored'] and rows[0]['gap_recoveries']==1 and rows[0]['exit_opportunities']
+ assert not any(x['event']=='EXIT_FILLED' for x in events)
+
+def test_recovery_requires_full_depth():
+ left=[quote('arcus',NS,'102','103'),quote('arcus',3*NS,'100','101',qty='.01'),quote('arcus',4*NS,'100','101')]
+ right=[quote('lighter_rh',NS,'99','100'),quote('lighter_rh',3*NS,'100','101'),quote('lighter_rh',4*NS,'100','101')]
+ _,rows,_=replay('g','SPY',left,right,500,10,0)
+ assert rows[0]['exit_ns']==4*NS and ['left','INSUFFICIENT_EXIT_DEPTH'] in rows[0]['gaps'][0]['reasons']
+
+def test_multiple_separate_gaps_and_open_inventory():
+ left=[quote('arcus',i*NS,'102','103') for i in (1,3,5,6)]
+ right=[quote('lighter_rh',i*NS,'99','100') for i in (1,3,5,6)]
+ _,rows,_=replay('g','SPY',left,right,500,10,0,max_hold_s=100)
+ assert rows[0]['right_censored'] and rows[0]['gap_recoveries']==2 and len(rows[0]['gaps'])==2
+ assert D(rows[0]['inventory']['arcus'])!=0
+
+def test_stop_is_distinct_from_convergence_and_timeout():
+ left=[quote('arcus',NS,'102','103'),quote('arcus',2*NS,'110','111'),quote('arcus',3*NS,'110','111')]
+ right=[quote('lighter_rh',NS,'99','100'),quote('lighter_rh',2*NS,'99','100'),quote('lighter_rh',3*NS,'99','100')]
+ _,rows,_=replay('g','SPY',left,right,1000,10,0,exit_mode='stop')
+ assert rows[0]['exit_reason']=='STOP_LOSS' and D(rows[0]['net'])<0
+
+def test_zero_and_nonzero_fees_keep_gross_consistent():
+ left=[quote('arcus',NS,'102','103'),quote('arcus',2*NS,'100','101'),quote('arcus',3*NS,'100','101')]
+ right=[quote('lighter_rh',NS,'99','100'),quote('lighter_rh',2*NS,'100','101'),quote('lighter_rh',3*NS,'100','101')]
+ a=replay('g','SPY',left,right,1000,10,0,fee_left=D(0))[1][0];b=replay('g','SPY',left,right,1000,10,0,fee_left=D('2.25'))[1][0]
+ assert a['gross']==b['gross'] and abs(D(a['net'])-D(b['net'])-D(b['fees']))<D('1e-26')
+
+def test_diagnostic_reports_source_and_receive_reasons():
+ from basis_convergence.engine import diagnose
+ a=quote('arcus',NS);b=quote('lighter_rh',NS,source=(NS-600000000)//1000)
+ assert ('right','SOURCE_TIMESTAMP_STALE') in diagnose(a,b,NS,500)
+ assert ('pair','SOURCE_SKEW_EXCEEDED') in diagnose(a,b,NS,500)
+ assert ('left','RECEIVE_TIMESTAMP_STALE') in diagnose(a,b,2*NS,500)
+
+def test_capture_end_retains_unpriced_inventory():
+ left=[quote('arcus',NS,'102','103'),quote('arcus',2*NS,'102','103')]
+ right=[quote('lighter_rh',NS,'99','100'),quote('lighter_rh',2*NS,'99','100')]
+ _,rows,_=replay('g','SPY',left,right,500,10,0,capture_end_ns=4*NS)
+ assert rows[0]['right_censored'] and rows[0]['valuation_stale_at_capture_end']
+ assert rows[0]['gaps'][-1]['recovered'] is False and rows[0]['net'] is None

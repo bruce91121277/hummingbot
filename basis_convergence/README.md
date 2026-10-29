@@ -30,3 +30,7 @@ Limitations: only Arcus × Lighter RH and 25% contraction are implemented; Exten
 Fourteen manifests verified and two captures were excluded. The four-symbol diagnostic counted 2,172 accepted one-second windows, 104 of which reached 10 bps; windows are not independent trades. The state machine opened five hypothetical trades, all right-censored on data gaps, with no completed PnL. Entry fees total approximately 0.11250008 assumed quote units, excluding unknown future exit costs. Signed venue inventories and any last available liquidation estimate are in `outputs/phase14b-history-full/residual_positions.csv`; a past estimate is not a current close price.
 
 The earlier Phase 14 freshness diagnostic also counted 104 windows at 500 ms, but its trading run did not apply that gate. This is not matched-condition trade parity; a gated legacy comparison remains outstanding. The isolated ledger and new tests do not replace a complete upstream test suite.
+
+## Phase 14C
+
+See `outputs/phase14c/report.md` for gap recovery results, research limits and reproduction. The 500 ms and 1000 ms runs are separate. No private exchange API or live trading is used.

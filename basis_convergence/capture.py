@@ -9,7 +9,7 @@ from hummingbot.core.data_type.order_book_row import OrderBookRow
 
 @dataclass(frozen=True)
 class Quote:
- venue:str;market:str;mono:int;utc:int;source:int;segment:int;sequence:int;bids:tuple;asks:tuple
+ venue:str;market:str;mono:int;utc:int;source:int;segment:int;sequence:int;bids:tuple;asks:tuple;invalid_reason:str="ORDERBOOK_INVALID"
 
 def verify(path):
  path=Path(path);manifest=json.loads((path/'manifest.json').read_text());files=manifest.get('files')
@@ -64,6 +64,6 @@ def read_capture(path):
      quality[venue+':accepted']+=1
      if t-last.get(sym,0)>=100000000:
       results[(venue,sym)].append(Quote(venue,sym,t,int(row['received_utc_ns']),int(row['source_timestamp']),seg,seq,bids,asks));last[sym]=t
-    except (ValueError,KeyError,TypeError,ArithmeticError):
-     states.pop(sym,None);results[(venue,sym)].append(Quote(venue,sym,t,int(row['received_utc_ns']),0,seg,0,(),()));quality[venue+':rejected']+=1
+    except (ValueError,KeyError,TypeError,ArithmeticError) as exc:
+     states.pop(sym,None);reason='SEQUENCE_GAP' if 'continuity' in str(exc) else 'ORDERBOOK_INVALID';results[(venue,sym)].append(Quote(venue,sym,t,int(row['received_utc_ns']),0,seg,0,(),(),reason));quality[venue+':rejected']+=1
  return manifest,dict(results),dict(quality)
