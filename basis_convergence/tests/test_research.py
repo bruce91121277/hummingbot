@@ -142,3 +142,32 @@ def test_capture_end_retains_unpriced_inventory():
  _,rows,_=replay('g','SPY',left,right,500,10,0,capture_end_ns=4*NS)
  assert rows[0]['right_censored'] and rows[0]['valuation_stale_at_capture_end']
  assert rows[0]['gaps'][-1]['recovered'] is False and rows[0]['net'] is None
+
+def test_hedge_failure_emergency_is_counterfactual_and_preserves_inventory():
+ left=[quote('arcus',i*NS,'102','103') for i in (1,2,3,4)]
+ right=[quote('lighter_rh',i*NS,'99','100',qty='.1') for i in (1,2,3,4)]
+ _,rows,events=replay('g','SPY',left,right,1000,10,0)
+ r=rows[0];assert D(r['unhedged_notional_assumed'])>0
+ assert r['emergency_close_scenario']['classification']=='HYPOTHETICAL_COUNTERFACTUAL'
+ assert D(r['emergency_close_scenario']['remaining_hedge_qty'])==D('.1')
+ assert len(r['fills'])==2 and not any(e['event']=='EXIT_FILLED' for e in events)
+
+def test_extended_and_core_market_timestamps_and_deltas(tmp_path):
+ import json,hashlib
+ from basis_convergence.capture import read_extended_core
+ meta={'markets':{'extended':{'BTC':{'name':'BTC-USD'}},'lighter_core':{'BTC':{'market_id':1}}}}
+ (tmp_path/'discovery.json').write_text(json.dumps(meta))
+ def row(v,seq,src,kind,body):
+  msg=({'type':kind,'seq':seq,'ts':src,'data':body} if v=='extended' else {'type':kind,'channel':'order_book:1','order_book':body})
+  return {'venue':v,'stream':'orderbooks/BTC' if v=='extended' else 'multiplex','market_id':'BTC-USD' if v=='extended' else '1','segment_id':1,'received_mono_ns':seq*NS,'received_utc_ns':seq*NS,'source_timestamp':src,'source_timestamp_unit':'ms_system_generated' if v=='extended' else 'us_UNVERIFIED','sequence':seq,'message':msg}
+ ext=[row('extended',1,1000,'SNAPSHOT',{'m':'BTC-USD','b':[{'p':'100','q':'2'}],'a':[{'p':'101','q':'2'}]}),row('extended',2,2000,'DELTA',{'m':'BTC-USD','b':[{'p':'100','c':'1'}],'a':[]})]
+ core=[row('lighter_core',1,1000000,'subscribed/order_book',{'nonce':1,'last_updated_at':1000000,'bids':[['100','2']],'asks':[['101','2']]}),row('lighter_core',2,2000000,'update/order_book',{'nonce':2,'begin_nonce':1,'last_updated_at':2000000,'bids':[['100','1']],'asks':[]})]
+ for name,rows in [('extended',ext),('lighter_core',core)]: (tmp_path/(name+'.jsonl')).write_text(''.join(json.dumps(r)+'\n' for r in rows))
+ files={}
+ for f in tmp_path.iterdir():
+  data=f.read_bytes();files[f.name]={'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}
+ (tmp_path/'manifest.json').write_text(json.dumps({'files':files}))
+ _,books,quality=read_extended_core(tmp_path)
+ assert books[('extended','BTC')][0].source==books[('lighter_core','BTC')][0].source==1000000
+ assert books[('extended','BTC')][-1].bids[0][1]==books[('lighter_core','BTC')][-1].bids[0][1]==D('1.0')
+ assert quality['extended:accepted']==quality['lighter_core:accepted']==2

@@ -1,0 +1,287 @@
+{
+  "route": "arcus_lighter_rh",
+  "route_config": {
+    "left": "arcus",
+    "right": "lighter_rh",
+    "markets": [
+      "SPY",
+      "QQQ",
+      "NVDA",
+      "SNDK"
+    ],
+    "source_units": [
+      "us_ASSUMED",
+      "us_ASSUMED"
+    ],
+    "book_semantics": [
+      "snapshot_UNVERIFIED",
+      "snapshot_delta_nonce"
+    ],
+    "multipliers": [
+      "1_ASSUMED",
+      "1_ASSUMED"
+    ],
+    "quote_currency": [
+      "USD_ASSUMED",
+      "USD_ASSUMED"
+    ],
+    "left_fee_bps": "2.25",
+    "right_fee_bps": "0",
+    "hedge_delay_ms": 100,
+    "freshness_ms": 500,
+    "exit_fraction": "0.25",
+    "max_hold_s": 120
+  },
+  "decision_ms": 250,
+  "right_fee_bps": "0",
+  "classification": "HYPOTHETICAL",
+  "captures": [
+    {
+      "capture": "capture_20261027T090443Z_d2bc56",
+      "events": {
+        "lighter_rh": 1515,
+        "lighter_core": 1641,
+        "extended": 736,
+        "arcus": 628
+      },
+      "quality": {
+        "arcus:accepted": 596,
+        "lighter_rh:accepted": 1330
+      }
+    },
+    {
+      "capture": "capture_20261027T090549Z_fad661",
+      "events": {
+        "lighter_core": 12598,
+        "lighter_rh": 12319,
+        "extended": 4334,
+        "arcus": 5012
+      },
+      "quality": {
+        "arcus:accepted": 4592,
+        "lighter_rh:accepted": 10754
+      }
+    },
+    {
+      "capture": "capture_20261027T091224Z_e089ff",
+      "events": {
+        "lighter_core": 2248,
+        "hyperliquid": 135,
+        "pacifica": 179,
+        "binance": 747,
+        "standx": 107
+      },
+      "quality": {}
+    },
+    {
+      "capture": "capture_20261027T091433Z_5325df",
+      "events": {
+        "lighter_core": 2471,
+        "pacifica": 220,
+        "binance": 767,
+        "hyperliquid": 166,
+        "standx": 146
+      },
+      "quality": {}
+    },
+    {
+      "capture": "capture_20261027T091525Z_ea6e0f",
+      "events": {
+        "lighter_core": 18131,
+        "hyperliquid": 1056,
+        "pacifica": 1605,
+        "binance": 5769,
+        "standx": 1028
+      },
+      "quality": {}
+    },
+    {
+      "capture": "capture_20261028T012035Z_a8920c",
+      "events": {
+        "arcus": 215,
+        "lighter_core": 13424,
+        "lighter_rh": 10329,
+        "extended": 419
+      },
+      "quality": {
+        "arcus:accepted": 192,
+        "lighter_rh:accepted": 9196
+      }
+    },
+    {
+      "capture": "capture_20261028T012536Z_4ef6d1",
+      "events": {
+        "standx": 21,
+        "lighter_core": 17585,
+        "hyperliquid": 33,
+        "pacifica": 112,
+        "binance": 5723
+      },
+      "quality": {}
+    },
+    {
+      "capture": "capture_20261028T020128Z_5dec44",
+      "events": {
+        "extended": 840,
+        "lighter_core": 2448,
+        "lighter_rh": 1819,
+        "arcus": 987
+      },
+      "quality": {
+        "arcus:accepted": 908,
+        "lighter_rh:accepted": 1670
+      }
+    },
+    {
+      "capture": "capture_20261028T020246Z_b2bcbd",
+      "events": {
+        "lighter_core": 12450,
+        "lighter_rh": 8760,
+        "extended": 4409,
+        "arcus": 4878
+      },
+      "quality": {
+        "arcus:accepted": 4588,
+        "lighter_rh:accepted": 7899
+      }
+    },
+    {
+      "capture": "capture_20261028T020129Z_e4a774",
+      "events": {
+        "hyperliquid": 188,
+        "lighter_core": 3516,
+        "pacifica": 343,
+        "binance": 1133,
+        "standx": 178
+      },
+      "quality": {}
+    },
+    {
+      "capture": "capture_20261028T020247Z_9cdf32",
+      "events": {
+        "pacifica": 1531,
+        "lighter_core": 17659,
+        "hyperliquid": 957,
+        "binance": 5747,
+        "standx": 1028
+      },
+      "quality": {}
+    },
+    {
+      "capture": "capture_20261028T015226Z_94691b",
+      "events": {
+        "lighter_core": 1214,
+        "lighter_rh": 1228,
+        "arcus": 483,
+        "extended": 408
+      },
+      "quality": {
+        "arcus:accepted": 447,
+        "lighter_rh:accepted": 1053
+      }
+    },
+    {
+      "capture": "capture_20261028T015308Z_93d122",
+      "events": {
+        "pacifica": 286,
+        "lighter_core": 3349,
+        "hyperliquid": 198,
+        "binance": 1125,
+        "standx": 214
+      },
+      "quality": {}
+    },
+    {
+      "capture": "capture_20261028T015308Z_a2ac8a",
+      "events": {
+        "lighter_core": 2400,
+        "lighter_rh": 2034,
+        "arcus": 978,
+        "extended": 1264
+      },
+      "quality": {
+        "arcus:accepted": 916,
+        "lighter_rh:accepted": 1821
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "capture": "capture_20261028T011904Z_e3a4fb",
+      "reason": "[Errno 2] No such file or directory: '/home/ubuntu/perp-arbitrage/data/phase13/capture_20261028T011904Z_e3a4fb/manifest.json'"
+    },
+    {
+      "capture": "capture_20261028T012020Z_2c473f",
+      "reason": "[Errno 2] No such file or directory: '/home/ubuntu/perp-arbitrage/data/phase13/capture_20261028T012020Z_2c473f/manifest.json'"
+    }
+  ],
+  "freshness_ms": 500,
+  "gap_grace_s": null,
+  "exit_mode": "percent",
+  "exit_fraction": "0.25",
+  "left_fee_bps": "2.25",
+  "freshness_sensitivity": {
+    "100": {
+      "samples": 242,
+      "positive": 242,
+      "edge_ge_10": 23
+    },
+    "250": {
+      "samples": 3801,
+      "positive": 3801,
+      "edge_ge_10": 289
+    },
+    "500": {
+      "samples": 8649,
+      "positive": 8649,
+      "edge_ge_10": 436
+    },
+    "1000": {
+      "samples": 10911,
+      "positive": 10911,
+      "edge_ge_10": 534
+    }
+  },
+  "entry_rejection_sample_reasons": {
+    "left:SOURCE_TIMESTAMP_STALE": 2662,
+    "left:RECEIVE_TIMESTAMP_STALE": 2182,
+    "pair:SOURCE_SKEW_EXCEEDED": 2766,
+    "pair:RECEIVE_SKEW_EXCEEDED": 2639,
+    "right:SOURCE_TIMESTAMP_IN_FUTURE": 10,
+    "right:RECEIVE_TIMESTAMP_STALE": 1479,
+    "right:SOURCE_TIMESTAMP_STALE": 1813
+  },
+  "gap_reasons": {
+    "left:RECEIVE_TIMESTAMP_STALE": {
+      "episodes": 128,
+      "episode_duration_upper_bound_seconds": 141.55707715
+    },
+    "left:SOURCE_TIMESTAMP_STALE": {
+      "episodes": 128,
+      "episode_duration_upper_bound_seconds": 141.55707715
+    },
+    "pair:RECEIVE_SKEW_EXCEEDED": {
+      "episodes": 155,
+      "episode_duration_upper_bound_seconds": 143.75
+    },
+    "pair:SOURCE_SKEW_EXCEEDED": {
+      "episodes": 151,
+      "episode_duration_upper_bound_seconds": 142.75
+    },
+    "right:RECEIVE_TIMESTAMP_STALE": {
+      "episodes": 77,
+      "episode_duration_upper_bound_seconds": 63.05707715
+    },
+    "right:SOURCE_TIMESTAMP_STALE": {
+      "episodes": 84,
+      "episode_duration_upper_bound_seconds": 65.55707715
+    }
+  },
+  "signals": 12,
+  "trades": 12,
+  "closed": 6,
+  "censored": 6,
+  "gap_episodes": 182,
+  "gap_recoveries": 176,
+  "limitations": "Timestamps are normalized from per-venue units; Lighter source microseconds and synchronization are assumptions; Arcus book snapshot semantics and contract economics UNVERIFIED. Decision interval is configurable; 100ms book sampling; Gap durations are sampled; each reason duration is an episode upper bound because reasons may overlap or change within an episode. Unknown intra-gap path. Position accounting hypothetical, all legs taker, funding assumed zero. No private API or live orders."
+}

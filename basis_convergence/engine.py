@@ -6,7 +6,7 @@ from hummingbot.core.data_type.order_book_row import OrderBookRow
 NS=1000000000
 
 def latest(quotes,t):
- i=bisect.bisect_right([q.mono for q in quotes],t)-1
+ i=bisect.bisect_right(quotes,t,key=lambda q:q.mono)-1
  return quotes[i] if i>=0 else None
 
 def diagnose(a,b,t,limit_ms):
@@ -46,33 +46,34 @@ class Ledger:
   self.inventory[venue]=self.inventory.get(venue,D(0))+sign*qty;self.cash-=sign*notional;self.fees+=fee
   self.fills.append({'id':fill_id,'venue':venue,'side':side,'qty':str(qty),'vwap':str(price),'notional':str(notional),'fee':str(fee),'role':'TAKER'});return True
 
-def replay(capture,market,left,right,limit_ms=500,entry_bps=10,delay_ms=100,exit_fraction=D('.25'),max_hold_s=120,*,gap_grace_s=None,exit_mode='percent',fee_left=D('2.25'),fee_right=D(0),stop_bps=D('10'),capture_end_ns=None):
+def replay(capture,market,left,right,limit_ms=500,entry_bps=10,delay_ms=100,exit_fraction=D('.25'),max_hold_s=120,*,gap_grace_s=None,exit_mode='percent',fee_left=D('2.25'),fee_right=D(0),stop_bps=D('10'),capture_end_ns=None,decision_ms=1000):
  if not left or not right:return [],[],[]
  start=max(left[0].mono,right[0].mono);end=capture_end_ns if capture_end_ns is not None else min(left[-1].mono,right[-1].mono);t=start;rows=[];events=[];signals=[]
  if end<start:return [],[],[]
  if gap_grace_s is not None and gap_grace_s<0:raise ValueError('invalid gap grace')
  if exit_mode not in ('percent','basis','net','combined','stop'):raise ValueError('invalid exit mode')
- fee_left=D(str(fee_left));fee_right=D(str(fee_right))
+ fee_left=D(str(fee_left));fee_right=D(str(fee_right));step=decision_ms*1000000
+ if decision_ms not in (100,250,1000):raise ValueError('invalid decision interval')
  def event(kind,t,venue,order,trade,details=None):events.append({'id':capture+':'+market+':'+str(len(events)),'capture':capture,'trade_id':trade,'time_mono_ns':t,'venue':venue,'market':market,'order_id':order,'event':kind,'details':details})
  while t<end:
   a=latest(left,t);b=latest(right,t)
-  if not fresh(a,b,t,limit_ms):t+=NS;continue
+  if not fresh(a,b,t,limit_ms):t+=step;continue
   sell=(a.bids[0][0]-b.asks[0][0])/b.asks[0][0]*10000;buy=(b.bids[0][0]-a.asks[0][0])/a.asks[0][0]*10000
   edge,side=(sell,'sell') if sell>=buy else (buy,'buy')
-  if edge<D(entry_bps):t+=NS;continue
+  if edge<D(entry_bps):t+=step;continue
   trade=capture+':'+market+':'+str(t);signals.append({'capture':capture,'market':market,'time_mono_ns':t,'edge_bps':str(edge),'side_left':side});ledger=Ledger();opp='buy' if side=='sell' else 'sell'
   event('SIGNAL_DETECTED',t,a.venue,'',trade);event('ENTRY_ATTEMPTED',t,a.venue,trade+':a',trade)
   qty=D(100)/(a.asks[0][0] if side=='buy' else a.bids[0][0]);q,p=walk(a,side,qty)
-  if not q:t+=NS;continue
+  if not q:t+=step;continue
   ledger.fill(trade+':a',a.venue,side,q,p,fee_left);entry_fee=ledger.fees;event('ENTRY_FILLED',t,a.venue,trade+':a',trade)
   ht=t+delay_ms*1000000;aa=latest(left,ht);bb=latest(right,ht)
   if ht<=end:event('HEDGE_ATTEMPTED',ht,b.venue,trade+':b',trade)
-  reason='HEDGE_FAILURE';exit_t=None;gross=None;net=None;last=None;last_t=None;censor_t=min(end,ht);gaps=[];opps=[];first={'25':None,'50':None,'net_positive':None};maximum=None;minimum=None;gap_start=None;gap_reason=set();recovered=0;simulation_enabled=True
+  h=D(0);reason='HEDGE_FAILURE';exit_t=None;gross=None;net=None;last=None;last_t=None;censor_t=min(end,ht);gaps=[];opps=[];first={'25':None,'50':None,'net_positive':None};maximum=None;minimum=None;gap_start=None;gap_reason=set();recovered=0;simulation_enabled=True
   if ht<=end and fresh(aa,bb,ht,limit_ms) and aa.segment==a.segment and bb.segment==b.segment:
    h,hp=walk(bb,opp,q)
    if h:ledger.fill(trade+':b',b.venue,opp,h,hp,fee_right);event('HEDGE_FILLED',ht,b.venue,trade+':b',trade)
    if h==q:
-    event('POSITION_OPEN',ht,'PAIR','',trade);reason='END_OF_CAPTURE';mid_a=(a.bids[0][0]+a.asks[0][0])/2;mid_b=(b.bids[0][0]+b.asks[0][0])/2;initial=(mid_a-mid_b)*(1 if side=='sell' else -1);tick=ht+NS;segments=(a.segment,b.segment)
+    event('POSITION_OPEN',ht,'PAIR','',trade);reason='END_OF_CAPTURE';mid_a=(a.bids[0][0]+a.asks[0][0])/2;mid_b=(b.bids[0][0]+b.asks[0][0])/2;initial=(mid_a-mid_b)*(1 if side=='sell' else -1);tick=ht+step;segments=(a.segment,b.segment)
     while tick<=end:
      x=latest(left,tick);y=latest(right,tick);why=diagnose(x,y,tick,limit_ms)
      if x and y and (x.segment,y.segment)!=segments:
@@ -86,7 +87,7 @@ def replay(capture,market,left,right,limit_ms=500,entry_bps=10,delay_ms=100,exit
       if gap_start is None:gap_start=tick;gap_reason=set();event('DATA_GAP_STARTED',tick,'PAIR','',trade)
       gap_reason.update(why);event('DATA_GAP_ACTIVE',tick,'PAIR','',trade,why)
       if gap_grace_s is not None and tick-gap_start>=gap_grace_s*NS:simulation_enabled=False
-      tick+=NS;continue
+      tick+=step;continue
      if gap_start is not None:
       if gap_grace_s is not None and tick-gap_start>=gap_grace_s*NS:simulation_enabled=False
       recovered+=1;gaps.append({'capture':capture,'market':market,'trade_id':trade,'start_ns':gap_start,'end_ns':tick,'duration_seconds':str(D(tick-gap_start)/NS),'reasons':sorted([list(z) for z in gap_reason]),'recovered':True});event('DATA_GAP_RECOVERED',tick,'PAIR','',trade);gap_start=None
@@ -112,13 +113,26 @@ def replay(capture,market,left,right,limit_ms=500,entry_bps=10,delay_ms=100,exit
        oid=trade+':exit:'+venue;event('EXIT_ATTEMPTED',tick,venue,oid,trade);ledger.fill(oid,venue,s,amount,price,fee);event('EXIT_FILLED',tick,venue,oid,trade)
       if all(v==0 for v in ledger.inventory.values()):exit_t=tick;gross=ledger.cash;net=gross-ledger.fees;event('POSITION_CLOSED',tick,'PAIR','',trade)
       break
-     tick+=NS
+     tick+=step
     if exit_t is None:
      censor_t=end
      if gap_start is not None:gaps.append({'capture':capture,'market':market,'trade_id':trade,'start_ns':gap_start,'end_ns':None,'duration_seconds':str(D(end-gap_start)/NS),'reasons':sorted([list(z) for z in gap_reason]),'recovered':False})
      reason='CAPTURE_END'
+  emergency=None;exposure=None;single_leg_observations=[]
+  if reason=='HEDGE_FAILURE':
+   exposure=str(abs(q-h) * p) if 'h' in locals() else str(q*p)
+   # Emergency liquidation is a separate hypothetical counterfactual, not an automatic fill.
+   for et in range(min(end,ht)+step,end+1,step):
+    x=latest(left,et);y=latest(right,et)
+    if not fresh(x,x,et,limit_ms):continue
+    closeq,closepx=walk(x,opp,q)
+    if closeq<q:continue
+    est=(p-closepx if side=='sell' else closepx-p)*q-entry_fee-q*closepx*fee_left/10000
+    single_leg_observations.append({'time_ns':et,'first_leg_liquidation_net':str(est)})
+    if emergency is None:emergency={'time_ns':et,'quantity':str(q),'price':str(closepx),'fee':str(q*closepx*fee_left/10000),'remaining_hedge_qty':str(h),'first_leg_net':str(est),'classification':'HYPOTHETICAL_COUNTERFACTUAL'}
+   censor_t=end
   if exit_t is None:event('POSITION_CENSORED',censor_t,'PAIR','',trade,'CAPTURE_END' if censor_t==end else reason)
-  rows.append({'capture':capture,'market':market,'trade_id':trade,'entry_ns':t,'entry_spread_bps':str(edge),'entry_fees':str(entry_fee),'hedge_ns':ht,'exit_ns':exit_t,'exit_reason':reason,'gross':str(gross) if gross is not None else None,'net':str(net) if net is not None else None,'fees':str(ledger.fees),'funding_assumption':'0','last_liquidation_estimate':last,'valuation_ns':last_t,'valuation_stale_at_capture_end':last_t is None or end-last_t>limit_ms*1000000,'inventory':{k:str(v) for k,v in ledger.inventory.items()},'fills':ledger.fills,'classification':'HYPOTHETICAL','right_censored':exit_t is None,'first_gap_ns':gaps[0]['start_ns'] if gaps else None,'gap_recoveries':recovered,'gaps':gaps,'exit_opportunities':opps,'maximum_observed_basis':str(maximum) if maximum is not None else None,'minimum_observed_basis':str(minimum) if minimum is not None else None,'first_25_seconds':first['25'],'first_50_seconds':first['50'],'first_positive_seconds':first['net_positive'],'source_clock_status':'ASSUMED_UNVERIFIED','capture_end_ns':end})
+  rows.append({'capture':capture,'market':market,'trade_id':trade,'entry_ns':t,'entry_spread_bps':str(edge),'entry_fees':str(entry_fee),'hedge_ns':ht,'exit_ns':exit_t,'exit_reason':reason,'gross':str(gross) if gross is not None else None,'net':str(net) if net is not None else None,'fees':str(ledger.fees),'funding_assumption':'0','last_liquidation_estimate':last,'valuation_ns':last_t,'valuation_stale_at_capture_end':last_t is None or end-last_t>limit_ms*1000000,'inventory':{k:str(v) for k,v in ledger.inventory.items()},'fills':ledger.fills,'classification':'HYPOTHETICAL','right_censored':exit_t is None,'first_gap_ns':gaps[0]['start_ns'] if gaps else None,'gap_recoveries':recovered,'gaps':gaps,'exit_opportunities':opps,'maximum_observed_basis':str(maximum) if maximum is not None else None,'minimum_observed_basis':str(minimum) if minimum is not None else None,'first_25_seconds':first['25'],'first_50_seconds':first['50'],'first_positive_seconds':first['net_positive'],'source_clock_status':'ASSUMED_UNVERIFIED','capture_end_ns':end,'unhedged_notional_assumed':exposure,'emergency_close_scenario':emergency,'single_leg_risk_observations':single_leg_observations})
   if exit_t is None:break
-  t=exit_t+NS
+  t=exit_t+step
  return signals,rows,events
