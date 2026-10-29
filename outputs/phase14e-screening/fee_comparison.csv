@@ -1,0 +1,6 @@
+route,"maker_bps_per_venue","taker_bps_per_venue","four_fill_round_trip_bps_per_100k_leg","usd_per_100k_notional_per_leg","evidence_status","notes"
+TxFlow x Lighter Core,TxFlow 1.5; Lighter UNKNOWN,"TxFlow 4.5; Lighter 0 scenario",9.0,90,TxFlow official VIP0; Lighter zero ASSUMED,"All taker entry+exit; excludes funding, slippage, quote conversion and unverified Lighter fee"
+RISEx x Lighter Core,RISEx 1.0; Lighter UNKNOWN,"RISEx 3.0; Lighter 0 scenario",6.0,60,RISEx official Tier1; Lighter zero ASSUMED,"All taker entry+exit; only a fee scenario, no capture validated"
+Nado x Lighter Core,Nado 1.0; Lighter UNKNOWN,"Nado 3.5; Lighter 0 scenario",7.0,70,"Nado official entry tier; Lighter zero ASSUMED","All taker entry+exit; USDT0-to-USDC conversion omitted"
+Arcus x Lighter RH,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,"Prior Arcus 2.25 bps is an old research scenario, not a verified current fee schedule"
+RISEx x Nado,RISEx 1.0; Nado 1.0,RISEx 3.0; Nado 3.5,13.0,130,Official published base tiers,"All taker entry+exit; quote settlement differs and economics are not reconciled"

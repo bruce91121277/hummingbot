@@ -171,3 +171,24 @@ def test_extended_and_core_market_timestamps_and_deltas(tmp_path):
  assert books[('extended','BTC')][0].source==books[('lighter_core','BTC')][0].source==1000000
  assert books[('extended','BTC')][-1].bids[0][1]==books[('lighter_core','BTC')][-1].bids[0][1]==D('1.0')
  assert quality['extended:accepted']==quality['lighter_core:accepted']==2
+
+
+def test_txflow_full_snapshot_has_no_invented_sequence_and_keeps_both_venues(tmp_path):
+ import hashlib,json
+ from basis_convergence.capture import read_extended_core
+ meta={'markets':{'txflow':{'BTC':{'name':'BTC-USDC','index':1}},'lighter_core':{'BTC':{'market_id':1}}}}
+ (tmp_path/'discovery.json').write_text(json.dumps(meta))
+ mono=10*NS
+ tx={'venue':'txflow','stream':'orderbook','market_id':'1','segment_id':1,'received_mono_ns':mono,'received_utc_ns':mono,'source_timestamp':1000,'source_timestamp_unit':'ms_documented','sequence':None,'message':{'channel':'l2Book','type':'l2Book','data':{'coin':'BTC-USDC','time':1000,'levels':[[{'px':'100','sz':'2'}],[{'px':'101','sz':'3'}]]}}}
+ core={'venue':'lighter_core','stream':'orderbook','market_id':'1','segment_id':1,'received_mono_ns':mono,'received_utc_ns':mono,'source_timestamp':1000000,'source_timestamp_unit':'us_UNVERIFIED','sequence':1,'message':{'channel':'order_book:1','type':'subscribed/order_book','order_book':{'nonce':1,'last_updated_at':1000000,'bids':[['100','2']],'asks':[['101','3']]}}}
+ for name,row in [('txflow',tx),('lighter_core',core)]: (tmp_path/(name+'.jsonl')).write_text(json.dumps(row)+'\n')
+ files={}
+ for f in tmp_path.iterdir():
+  content=f.read_bytes();files[f.name]={'sha256':hashlib.sha256(content).hexdigest(),'bytes':len(content)}
+ (tmp_path/'manifest.json').write_text(json.dumps({'files':files}))
+ _,books,quality=read_extended_core(tmp_path,'txflow')
+ left=books[('txflow','BTC')][0];right=books[('lighter_core','BTC')][0]
+ assert left.source==1000000 and left.sequence is None
+ assert left.bids[0][1]==D('2.0') and left.asks[0][1]==D('3.0')
+ assert right.sequence==1 and right.source==1000000
+ assert quality['txflow:accepted']==quality['lighter_core:accepted']==1

@@ -34,3 +34,29 @@ The earlier Phase 14 freshness diagnostic also counted 104 windows at 500 ms, bu
 ## Phase 14C
 
 See `outputs/phase14c/report.md` for gap recovery results, research limits and reproduction. The 500 ms and 1000 ms runs are separate. No private exchange API or live trading is used.
+
+## Phase 14E - venue screening and TxFlow public capture
+
+The public-only TxFlow reader is `basis_convergence.txflow_capture`. It discovers BTC-USDC and Lighter Core BTC from public metadata, records bounded L2 snapshots with receive/source timestamps and segment IDs, and hashes every capture file in a manifest. It never loads wallet credentials or trading endpoints. TxFlow documents linear perpetuals with one underlying unit and describes each `l2Book` push as a full snapshot with millisecond source time; the capture itself retains no sequence for TxFlow. Lighter source-time units and cross-venue clock alignment remain assumptions.
+
+Capture at most five minutes per run:
+
+```sh
+cd ~/perp-arbitrage-hb
+.venv-research/bin/python -m basis_convergence.txflow_capture \
+  --output-root ~/perp-arbitrage/data/phase14e \
+  --seconds 300
+```
+
+Replay the retained capture with the same 500 ms gate and explicit hypothetical fees:
+
+```sh
+.venv-research/bin/python -m basis_convergence.research \
+  --capture-root ~/perp-arbitrage/data/phase14e \
+  --route txflow_lighter_core --mode hypothetical \
+  --freshness-ms 500 --output outputs/phase14e-replay-500
+```
+
+The Oct 29, 2026 review found 2 manifest-valid captures (6,557 events total: TxFlow 298, Lighter Core 6,259). At 500 ms the replay produced 4 hypothetical entries, 2 timeouts and 2 capture-end censored positions; no trade exited for convergence. With the documented TxFlow VIP0 taker rate of 4.5 bps and a zero-fee Lighter scenario, both timeout PnLs were negative (combined net -0.186234 quote units). The zero-fee scenario still had a combined gross result of -0.006274 quote units. These are tiny-sample hypothetical units, not verified USD PnL; no profitability claim follows.
+
+See `docs/reward_eligibility.md`, `docs/recommended_pair.md`, and `outputs/phase14e-screening/` for current venue evidence and limitations.
