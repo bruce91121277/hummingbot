@@ -188,7 +188,7 @@ def test_txflow_full_snapshot_has_no_invented_sequence_and_keeps_both_venues(tmp
  (tmp_path/'manifest.json').write_text(json.dumps({'files':files}))
  _,books,quality=read_extended_core(tmp_path,'txflow')
  left=books[('txflow','BTC')][0];right=books[('lighter_core','BTC')][0]
- assert left.source==1000000 and left.sequence is None
+ assert left.source==1000000 and left.source_raw==1000 and left.sequence is None
  assert left.bids[0][1]==D('2.0') and left.asks[0][1]==D('3.0')
- assert right.sequence==1 and right.source==1000000
+ assert right.sequence==1 and right.source==1000000 and right.source_raw==1000000
  assert quality['txflow:accepted']==quality['lighter_core:accepted']==1

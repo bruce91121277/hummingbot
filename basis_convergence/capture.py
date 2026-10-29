@@ -10,7 +10,7 @@ from hummingbot.core.data_type.order_book_row import OrderBookRow
 
 @dataclass(frozen=True)
 class Quote:
- venue:str;market:str;mono:int;utc:int;source:int;segment:int;sequence:Optional[int];bids:tuple;asks:tuple;invalid_reason:str="ORDERBOOK_INVALID"
+ venue:str;market:str;mono:int;utc:int;source:int;segment:int;sequence:Optional[int];bids:tuple;asks:tuple;invalid_reason:str="ORDERBOOK_INVALID";source_raw:Optional[int]=None
 
 def verify(path):
  path=Path(path);manifest=json.loads((path/'manifest.json').read_text());files=manifest.get('files')
@@ -69,8 +69,9 @@ def read_capture(path):
      states.pop(sym,None);reason='SEQUENCE_GAP' if 'continuity' in str(exc) else 'ORDERBOOK_INVALID';results[(venue,sym)].append(Quote(venue,sym,t,int(row['received_utc_ns']),0,seg,0,(),(),reason));quality[venue+':rejected']+=1
  return manifest,dict(results),dict(quality)
 
-def read_extended_core(path,left_venue='extended'):
+def read_extended_core(path,left_venue='extended',sample_interval_ms=100):
  """Replay only manifest-verified BTC books; source clocks remain research assumptions."""
+ if sample_interval_ms is not None and sample_interval_ms<=0:raise ValueError('invalid sample interval')
  path=Path(path); manifest=verify(path); meta=json.loads((path/'discovery.json').read_text())['markets']; out=defaultdict(list); quality=Counter()
  btc=meta.get('lighter_core',{}).get('BTC',{}); market_id=str(btc.get('market_id',''))
  left_meta=meta.get(left_venue,{}).get('BTC',{}); left_name='BTC-USD' if left_venue=='extended' else 'BTC-USDC'
@@ -90,7 +91,8 @@ def read_extended_core(path,left_venue='extended'):
    else:
     if str(row.get('market_id'))!=market_id or msg.get('channel')!='order_book:'+market_id:continue
     kind=msg.get('type'); snap=kind=='subscribed/order_book'; delta=kind=='update/order_book'; seq=body.get('nonce'); timestamp=body.get('last_updated_at',msg.get('last_updated_at')); unit='us_UNVERIFIED'
-   if not (snap or delta):continue
+   if not (snap or delta):quality[venue+':unknown_event']+=1;continue
+   quality[venue+':snapshots_seen' if snap else venue+':deltas_seen']+=1
    t=int(row['received_mono_ns']); seg=int(row['segment_id']); reason='ORDERBOOK_INVALID'
    try:
     if row.get('source_timestamp_unit')!=unit or timestamp is None or row.get('source_timestamp')!=timestamp:raise ValueError('timestamp mismatch')
@@ -122,9 +124,9 @@ def read_extended_core(path,left_venue='extended'):
     b=tuple((Decimal(str(x.price)),Decimal(str(x.amount))) for x in list(ob.bid_entries())[:20]); a=tuple((Decimal(str(x.price)),Decimal(str(x.amount))) for x in list(ob.ask_entries())[:20])
     if not b or not a or b[0][0]>=a[0][0]:raise ValueError('invalid book')
     state=(seg,seq,ob);quality[venue+':accepted']+=1
-    if t-last_time>=100000000:
+    if sample_interval_ms is None or t-last_time>=sample_interval_ms*1000000:
      source=int(timestamp)*1000 if venue in ('extended','txflow') else int(timestamp)
-     out[(venue,'BTC')].append(Quote(venue,'BTC',t,int(row['received_utc_ns']),source,seg,seq,b,a));last_time=t
+     out[(venue,'BTC')].append(Quote(venue,'BTC',t,int(row['received_utc_ns']),source,seg,seq,b,a,source_raw=int(timestamp)));last_time=t
    except (ValueError,KeyError,TypeError,ArithmeticError):
-    state=None;quality[venue+':rejected']+=1;out[(venue,'BTC')].append(Quote(venue,'BTC',t,int(row['received_utc_ns']),0,seg,0,(),(),reason))
+    state=None;quality[venue+':rejected']+=1;quality[venue+':'+reason]+=1;out[(venue,'BTC')].append(Quote(venue,'BTC',t,int(row['received_utc_ns']),0,seg,0,(),(),reason))
  return manifest,dict(out),dict(quality)
