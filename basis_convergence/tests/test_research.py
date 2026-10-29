@@ -79,3 +79,10 @@ def test_stale_exit_censors_at_gap():
  _,rows,events=replay('capture','SPY',left,right,500,10,0)
  assert rows[0]['exit_reason']=='DATA_GAP' and rows[0]['exit_ns'] is None
  assert [x['event'] for x in events][-2:]==['DATA_GAP','POSITION_CENSORED']
+def test_multilevel_vwap_matches_reference_for_both_sides():
+ q=Quote('arcus','SPY',NS,NS,NS//1000,1,1,((D('99'),D('1')),(D('98'),D('2'))),((D('101'),D('1')),(D('102'),D('2'))))
+ for side,expected in [('buy',D('101.5')),('sell',D('98.5'))]:
+  amount,price=walk(q,side,D('2'))
+  assert amount==2 and price==expected
+  amount,price=walk(q,side,D('4'))
+  assert amount==3 and abs(price-(D('305')/3 if side=='buy' else D('295')/3))<D('1e-10')
