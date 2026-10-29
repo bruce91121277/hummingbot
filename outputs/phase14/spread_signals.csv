@@ -1,0 +1,2 @@
+capture,market,receive_mono_ns,arcus_source_timestamp_raw,lighter_source_timestamp_raw,arcus_source_age_ms_assumed,lighter_source_age_ms_assumed,source_skew_ms_assumed,edge_bps,side_left,segment_left,segment_right
+capture_20261029T023224Z_f462f4,SNDK,7820850413479878,1793241162202037,1793241162935771,865.881264,132.147264,733.734,10.06876594221274183684124167,buy,1,1

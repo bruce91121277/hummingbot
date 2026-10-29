@@ -1,0 +1,52 @@
+{
+  "classification": "HYPOTHETICAL",
+  "captures": [
+    {
+      "capture": "capture_20261029T023224Z_f462f4",
+      "manifest_verified": true,
+      "events": 39698,
+      "quality": {
+        "arcus:SPY:valid_updates": 1166,
+        "arcus:QQQ:valid_updates": 1166,
+        "arcus:NVDA:valid_updates": 1166,
+        "arcus:SNDK:valid_updates": 1163,
+        "extended:BTC:valid_updates": 2741,
+        "extended:ETH:valid_updates": 2773,
+        "lighter_core:ETH:valid_updates": 5924,
+        "lighter_core:BTC:valid_updates": 5917,
+        "lighter_rh:SPY:valid_updates": 3026,
+        "lighter_rh:QQQ:valid_updates": 3286,
+        "lighter_rh:NVDA:valid_updates": 1761,
+        "lighter_rh:SNDK:valid_updates": 4708
+      }
+    }
+  ],
+  "excluded": [],
+  "freshness_ms_assumed": {
+    "100": {
+      "samples": 0,
+      "positive": 0,
+      "edge_ge_10": 0
+    },
+    "250": {
+      "samples": 243,
+      "positive": 243,
+      "edge_ge_10": 0
+    },
+    "500": {
+      "samples": 882,
+      "positive": 882,
+      "edge_ge_10": 0
+    },
+    "1000": {
+      "samples": 1048,
+      "positive": 1048,
+      "edge_ge_10": 1
+    }
+  },
+  "signals": 1,
+  "trades": 1,
+  "closed": 1,
+  "censored": 0,
+  "limitations": "Legacy capture loader and state machine/ledger reused. Only order book VWAP runs in Hummingbot; this is not a Hummingbot execution engine. Freshness is a diagnostic, not applied to strategy. Source microseconds, independent clocks, units, fees and 1:1 conversion assumed. No private trading, maker fills or qualified PnL."
+}

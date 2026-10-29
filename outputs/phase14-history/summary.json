@@ -1,0 +1,300 @@
+{
+  "classification": "HYPOTHETICAL",
+  "captures": [
+    {
+      "capture": "capture_20261027T090443Z_d2bc56",
+      "manifest_verified": true,
+      "events": 4509,
+      "quality": {
+        "arcus:SPY:valid_updates": 149,
+        "arcus:QQQ:valid_updates": 149,
+        "arcus:NVDA:valid_updates": 149,
+        "arcus:SNDK:valid_updates": 149,
+        "extended:ETH:valid_updates": 344,
+        "extended:BTC:valid_updates": 388,
+        "lighter_core:BTC:valid_updates": 695,
+        "lighter_core:ETH:valid_updates": 717,
+        "lighter_rh:SPY:valid_updates": 435,
+        "lighter_rh:QQQ:valid_updates": 277,
+        "lighter_rh:NVDA:valid_updates": 120,
+        "lighter_rh:SNDK:valid_updates": 498
+      }
+    },
+    {
+      "capture": "capture_20261027T090549Z_fad661",
+      "manifest_verified": true,
+      "events": 34242,
+      "quality": {
+        "arcus:SPY:valid_updates": 1148,
+        "arcus:QQQ:valid_updates": 1148,
+        "arcus:NVDA:valid_updates": 1148,
+        "arcus:SNDK:valid_updates": 1148,
+        "extended:ETH:valid_updates": 2093,
+        "extended:BTC:valid_updates": 2186,
+        "lighter_core:BTC:valid_updates": 5391,
+        "lighter_core:ETH:valid_updates": 5453,
+        "lighter_rh:SPY:valid_updates": 3463,
+        "lighter_rh:QQQ:valid_updates": 2369,
+        "lighter_rh:SNDK:valid_updates": 3551,
+        "lighter_rh:NVDA:valid_updates": 1371
+      }
+    },
+    {
+      "capture": "capture_20261027T091224Z_e089ff",
+      "manifest_verified": true,
+      "events": 2578,
+      "quality": {
+        "binance:BTC:valid_updates": 365,
+        "binance:ETH:valid_updates": 382,
+        "hyperliquid:BTC:valid_updates": 8,
+        "hyperliquid:SOL:valid_updates": 8,
+        "lighter_core:BTC:valid_updates": 688,
+        "lighter_core:SOL:valid_updates": 620,
+        "lighter_core:ETH:valid_updates": 696,
+        "pacifica:BTC:valid_updates": 123,
+        "pacifica:SOL:valid_updates": 46,
+        "standx:BTC:valid_updates": 37,
+        "standx:ETH:valid_updates": 44
+      }
+    },
+    {
+      "capture": "capture_20261027T091433Z_5325df",
+      "manifest_verified": true,
+      "events": 2912,
+      "quality": {
+        "binance:ETH:valid_updates": 386,
+        "binance:BTC:valid_updates": 381,
+        "hyperliquid:BTC:valid_updates": 8,
+        "hyperliquid:SOL:valid_updates": 8,
+        "lighter_core:BTC:valid_updates": 716,
+        "lighter_core:SOL:valid_updates": 674,
+        "lighter_core:ETH:valid_updates": 748,
+        "pacifica:BTC:valid_updates": 122,
+        "pacifica:SOL:valid_updates": 88,
+        "standx:BTC:valid_updates": 55,
+        "standx:ETH:valid_updates": 63
+      }
+    },
+    {
+      "capture": "capture_20261027T091525Z_ea6e0f",
+      "manifest_verified": true,
+      "events": 21207,
+      "quality": {
+        "binance:BTC:valid_updates": 2869,
+        "binance:ETH:valid_updates": 2900,
+        "hyperliquid:BTC:valid_updates": 56,
+        "hyperliquid:SOL:valid_updates": 56,
+        "lighter_core:BTC:valid_updates": 5256,
+        "lighter_core:SOL:valid_updates": 4981,
+        "lighter_core:ETH:valid_updates": 5389,
+        "pacifica:BTC:valid_updates": 888,
+        "pacifica:SOL:valid_updates": 682,
+        "standx:BTC:valid_updates": 392,
+        "standx:ETH:valid_updates": 434
+      }
+    },
+    {
+      "capture": "capture_20261028T012035Z_a8920c",
+      "manifest_verified": true,
+      "events": 24367,
+      "quality": {
+        "arcus:SPY:valid_updates": 48,
+        "arcus:QQQ:valid_updates": 48,
+        "arcus:NVDA:valid_updates": 48,
+        "arcus:SNDK:valid_updates": 48,
+        "extended:BTC:valid_updates": 415,
+        "lighter_core:ETH:valid_updates": 5503,
+        "lighter_core:BTC:valid_updates": 5564,
+        "lighter_rh:SPY:valid_updates": 1991,
+        "lighter_rh:QQQ:valid_updates": 1930,
+        "lighter_rh:NVDA:valid_updates": 1132,
+        "lighter_rh:SNDK:valid_updates": 4143
+      }
+    },
+    {
+      "capture": "capture_20261028T012536Z_4ef6d1",
+      "manifest_verified": true,
+      "events": 17720,
+      "quality": {
+        "binance:ETH:valid_updates": 2883,
+        "binance:BTC:valid_updates": 2840,
+        "hyperliquid:BTC:valid_updates": 3,
+        "hyperliquid:SOL:valid_updates": 3,
+        "lighter_core:SOL:valid_updates": 4590,
+        "lighter_core:ETH:valid_updates": 5266,
+        "lighter_core:BTC:valid_updates": 5349,
+        "pacifica:SOL:valid_updates": 42,
+        "pacifica:BTC:valid_updates": 60,
+        "standx:BTC:valid_updates": 9,
+        "standx:ETH:valid_updates": 6
+      }
+    },
+    {
+      "capture": "capture_20261028T020128Z_5dec44",
+      "manifest_verified": true,
+      "events": 6081,
+      "quality": {
+        "arcus:SPY:valid_updates": 227,
+        "arcus:QQQ:valid_updates": 227,
+        "arcus:NVDA:valid_updates": 227,
+        "arcus:SNDK:valid_updates": 227,
+        "extended:ETH:valid_updates": 386,
+        "extended:BTC:valid_updates": 446,
+        "lighter_core:ETH:valid_updates": 1007,
+        "lighter_core:BTC:valid_updates": 1120,
+        "lighter_rh:SNDK:valid_updates": 812,
+        "lighter_rh:SPY:valid_updates": 298,
+        "lighter_rh:NVDA:valid_updates": 200,
+        "lighter_rh:QQQ:valid_updates": 360
+      }
+    },
+    {
+      "capture": "capture_20261028T020246Z_b2bcbd",
+      "manifest_verified": true,
+      "events": 30476,
+      "quality": {
+        "arcus:SPY:valid_updates": 1147,
+        "arcus:QQQ:valid_updates": 1147,
+        "arcus:NVDA:valid_updates": 1147,
+        "arcus:SNDK:valid_updates": 1147,
+        "extended:ETH:valid_updates": 2094,
+        "extended:BTC:valid_updates": 2195,
+        "lighter_core:ETH:valid_updates": 5196,
+        "lighter_core:BTC:valid_updates": 5531,
+        "lighter_rh:SPY:valid_updates": 1490,
+        "lighter_rh:QQQ:valid_updates": 1663,
+        "lighter_rh:NVDA:valid_updates": 915,
+        "lighter_rh:SNDK:valid_updates": 3831
+      }
+    },
+    {
+      "capture": "capture_20261028T020129Z_e4a774",
+      "manifest_verified": true,
+      "events": 4096,
+      "quality": {
+        "binance:BTC:valid_updates": 567,
+        "binance:ETH:valid_updates": 566,
+        "hyperliquid:BTC:valid_updates": 12,
+        "hyperliquid:SOL:valid_updates": 12,
+        "lighter_core:ETH:valid_updates": 1012,
+        "lighter_core:SOL:valid_updates": 955,
+        "lighter_core:BTC:valid_updates": 1121,
+        "pacifica:SOL:valid_updates": 137,
+        "pacifica:BTC:valid_updates": 195,
+        "standx:BTC:valid_updates": 59,
+        "standx:ETH:valid_updates": 79
+      }
+    },
+    {
+      "capture": "capture_20261028T020247Z_9cdf32",
+      "manifest_verified": true,
+      "events": 20558,
+      "quality": {
+        "binance:BTC:valid_updates": 2870,
+        "binance:ETH:valid_updates": 2877,
+        "hyperliquid:BTC:valid_updates": 57,
+        "hyperliquid:SOL:valid_updates": 57,
+        "lighter_core:SOL:valid_updates": 4815,
+        "lighter_core:ETH:valid_updates": 5187,
+        "lighter_core:BTC:valid_updates": 5528,
+        "pacifica:SOL:valid_updates": 598,
+        "pacifica:BTC:valid_updates": 891,
+        "standx:BTC:valid_updates": 398,
+        "standx:ETH:valid_updates": 430
+      }
+    },
+    {
+      "capture": "capture_20261028T015226Z_94691b",
+      "manifest_verified": true,
+      "events": 3320,
+      "quality": {
+        "arcus:SPY:valid_updates": 112,
+        "arcus:QQQ:valid_updates": 112,
+        "arcus:NVDA:valid_updates": 111,
+        "arcus:SNDK:valid_updates": 112,
+        "extended:ETH:valid_updates": 199,
+        "extended:BTC:valid_updates": 205,
+        "lighter_core:ETH:valid_updates": 510,
+        "lighter_core:BTC:valid_updates": 544,
+        "lighter_rh:SPY:valid_updates": 253,
+        "lighter_rh:SNDK:valid_updates": 414,
+        "lighter_rh:QQQ:valid_updates": 244,
+        "lighter_rh:NVDA:valid_updates": 142
+      }
+    },
+    {
+      "capture": "capture_20261028T015308Z_93d122",
+      "manifest_verified": true,
+      "events": 3916,
+      "quality": {
+        "binance:ETH:valid_updates": 565,
+        "binance:BTC:valid_updates": 560,
+        "hyperliquid:BTC:valid_updates": 12,
+        "hyperliquid:SOL:valid_updates": 12,
+        "lighter_core:SOL:valid_updates": 869,
+        "lighter_core:ETH:valid_updates": 999,
+        "lighter_core:BTC:valid_updates": 1082,
+        "pacifica:BTC:valid_updates": 170,
+        "pacifica:SOL:valid_updates": 105,
+        "standx:BTC:valid_updates": 104,
+        "standx:ETH:valid_updates": 70
+      }
+    },
+    {
+      "capture": "capture_20261028T015308Z_a2ac8a",
+      "manifest_verified": true,
+      "events": 6663,
+      "quality": {
+        "arcus:SPY:valid_updates": 229,
+        "arcus:QQQ:valid_updates": 229,
+        "arcus:NVDA:valid_updates": 229,
+        "arcus:SNDK:valid_updates": 229,
+        "extended:ETH:valid_updates": 603,
+        "extended:BTC:valid_updates": 654,
+        "lighter_core:ETH:valid_updates": 1011,
+        "lighter_core:BTC:valid_updates": 1082,
+        "lighter_rh:SPY:valid_updates": 494,
+        "lighter_rh:QQQ:valid_updates": 367,
+        "lighter_rh:NVDA:valid_updates": 241,
+        "lighter_rh:SNDK:valid_updates": 719
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "capture": "capture_20261028T011904Z_e3a4fb",
+      "reason": "INTEGRITY_UNVERIFIED"
+    },
+    {
+      "capture": "capture_20261028T012020Z_2c473f",
+      "reason": "INTEGRITY_UNVERIFIED"
+    }
+  ],
+  "freshness_ms_assumed": {
+    "100": {
+      "samples": 40,
+      "positive": 40,
+      "edge_ge_10": 5
+    },
+    "250": {
+      "samples": 948,
+      "positive": 948,
+      "edge_ge_10": 67
+    },
+    "500": {
+      "samples": 2172,
+      "positive": 2172,
+      "edge_ge_10": 104
+    },
+    "1000": {
+      "samples": 2749,
+      "positive": 2749,
+      "edge_ge_10": 133
+    }
+  },
+  "signals": 137,
+  "trades": 8,
+  "closed": 3,
+  "censored": 5,
+  "limitations": "Legacy capture loader and state machine/ledger reused. Only order book VWAP runs in Hummingbot; this is not a Hummingbot execution engine. Freshness is a diagnostic, not applied to strategy. Source microseconds, independent clocks, units, fees and 1:1 conversion assumed. No private trading, maker fills or qualified PnL."
+}
